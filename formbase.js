@@ -146,6 +146,8 @@ var initRoutes = function(server, name, Model) {
 initRoutes(server, 'rawform', RawForm);
 initRoutes(server, 'form', Form);
 
-server.listen(28001, function() {
+var argv = require('optimist').default('port', 28001).argv;
+
+server.listen(argv.port, function() {
     console.log('%s listening at %s', server.name, server.url);
 });

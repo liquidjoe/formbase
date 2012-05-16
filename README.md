@@ -25,6 +25,10 @@ Install Restify:
 
 `$ npm install -g restify`
 
+Install Optimist:
+
+`$ npm install -g optimist`
+
 and you need node-unit to run the tests:
 
 `$ npm install -g nodeunit`
