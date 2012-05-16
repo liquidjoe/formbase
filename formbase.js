@@ -112,6 +112,14 @@ var queryObj = function(Model, req, res, next) {
     return next();
 }
 
+/**
+ * We define a set of restful endpoints for the given model class.
+ * ex: initRoutes(server, 'rawform', RawForm) creates the following routes:
+ *
+ * /rawform       --- POST & PUT
+ * /rawform/:id   --- GET, HEAD, and DELETE for form at given id
+ * /rawforms/     --- GET a query of rawform objects. You should pass in limit and skip parameters.
+ */
 var initRoutes = function(server, name, Model) {
     server.post('/' + name, function(req, res, next) {
         return save(Model, req, res, next);

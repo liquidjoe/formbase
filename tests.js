@@ -13,7 +13,7 @@ var client = restify.createJsonClient({
 
 var theFormID = null;
 
-var createTestData = function(i, callback) {
+var createRawFormTestData = function(i, callback) {
     var formData = {
         "srcURL": "http://www.testsrus.com/" + i,
         "formHTML": '<form id="saveForm"><input type="password" name="pw"><input type="submit"></form>',
@@ -22,10 +22,47 @@ var createTestData = function(i, callback) {
     client.post('/rawform', formData, callback);
 }
 
+var formIDs = [];
+
 exports.testCreateABunchOfRawForms = function(test) {
     test.leftToDo = 10;
     for (var i = 0; i < 10; i++) {
-        createTestData(i, function(err, req, res, obj) {
+        createRawFormTestData(i, function(err, req, res, obj) {
+            formIDs.push(obj.id);
+            test.leftToDo--;
+            if (!test.leftToDo) {
+                test.done();
+            }
+        });
+    }
+}
+
+var createFormTestData = function(i, callback) {
+    var fieldsData = [
+        {
+            fieldType: "password",
+            name: "pw" + i
+        },
+        {
+            fieldType: "submit",
+            name: "OK"
+        }
+
+    ]
+    var formData = {
+        rawform: formIDs[i],
+        hasEmail: false,
+        hasPassword: false,
+        hasPhone: false,
+        fields: fieldsData
+    }
+    client.post('/form', formData, callback);
+}
+
+exports.testCreateABunchOfForms = function(test) {
+    test.leftToDo = 10;
+    for (var i = 0; i < 10; i++) {
+        createFormTestData(i, function(err, req, res, obj) {
             test.leftToDo--;
             if (!test.leftToDo) {
                 test.done();
@@ -105,6 +142,60 @@ exports.testFindRawFormsWithLimitAndSkip = function(test) {
 
         // nesting call so we can check the results
         client.get('/rawforms/?limit=5&skip=4', function(err, req, res, skipList) {
+            test.ok(!err, "forms query is err: " + err);
+            test.ok(skipList.length == 5, "got only a limit of forms");
+            test.ok(skipList[0]._id == limitList[4]._id, "first skipped list == last limitList");
+            test.done();
+        });
+    });
+}
+
+exports.testPostForm = function(test){
+    test.expect(2);
+    var fieldsData = [
+        {
+            fieldType: "password",
+            name: "pw"
+        },
+        {
+            fieldType: "submit",
+            name: "OK"
+        }
+
+    ]
+    var formData = {
+        rawform: theFormID,
+        hasEmail: false,
+        hasPassword: false,
+        hasPhone: false,
+        fields: fieldsData
+    }
+    client.post('/form', formData, function(err, req, res, obj) {
+        test.ok(!err, "form post is err: " + err);
+        theFormID = obj.id;
+        test.ok(theFormID, "the formID is something");
+        test.done();
+    });
+};
+
+exports.testGetLastForm = function(test){
+    test.expect(3);
+    client.get('/form/' + theFormID, function(err, req, res, obj) {
+        test.ok(!err, "form get is err: " + err);
+        test.ok(obj, "got the form we put in");
+        test.ok(obj._id == theFormID, "has the right ID");
+        test.done();
+    });
+};
+
+exports.testFindFormsWithLimitAndSkip = function(test) {
+    test.expect(5);
+    client.get('/forms/?limit=5', function(err, req, res, limitList) {
+        test.ok(!err, "forms query is err: " + err);
+        test.ok(limitList.length == 5, "got only a limit of forms");
+
+        // nesting call so we can check the results
+        client.get('/forms/?limit=5&skip=4', function(err, req, res, skipList) {
             test.ok(!err, "forms query is err: " + err);
             test.ok(skipList.length == 5, "got only a limit of forms");
             test.ok(skipList[0]._id == limitList[4]._id, "first skipped list == last limitList");
