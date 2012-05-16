@@ -41,7 +41,7 @@ To run it just run using node:
 Once it's running then you can run the tests
 in another window:
 
-`$ node tests.js`
+`$ nodeunit tests.js`
 
 Formbase Objects
 ----------------
