@@ -66,9 +66,9 @@ var server = restify.createServer({name: "FormBase"});
 server.use(restify.queryParser());      // query params copied into req.params
 server.use(restify.bodyParser({ mapParams: false }));
 
-function getRawFormByID(req, res, next) {
+var getByID = function(Model, req, res, next) {
     var id = req.params["id"];
-    RawForm.findById(id).findOne(function(err, doc) {
+    Model.findById(id).findOne(function(err, doc) {
         if (err) {
             res.json({});
         } else {
@@ -78,31 +78,25 @@ function getRawFormByID(req, res, next) {
     return next();
 }
 
-var saveRawForm = function create(req, res, next) {
-    var formModel = new RawForm(req.body);
-    formModel.save(function(err){
-        res.json({id: formModel.get('_id')});
+var save = function(Model, req, res, next) {
+    var model = new Model(req.body);
+    model.save(function(err){
+        res.json({id: model.get('_id')});
     });
     return next();
 }
 
-server.post('/rawform', saveRawForm);
-server.put('/rawform', saveRawForm);
-
-server.get('/rawform/:id', getRawFormByID);
-server.head('/rawform/:id', getRawFormByID);
-
-server.del('/rawform/:id', function rm(req, res, next) {
+var deleteObj = function(Model, req, res, next) {
     var id = req.params["id"];
-    RawForm.findById(id).findOne(function(err, doc) {
+    Model.findById(id).findOne(function(err, doc) {
         doc.remove();
         res.send(204);
     });
     return next();
-});
+}
 
-var rawFormQuery = function(req, res, next) {
-    var query = RawForm.find();
+var queryObj = function(Model, req, res, next) {
+    var query = Model.find();
     if (req.params["limit"]) {
         var limit = parseInt(req.params["limit"]);
         query.limit(limit);
@@ -118,7 +112,27 @@ var rawFormQuery = function(req, res, next) {
     return next();
 }
 
-server.get('/rawforms/', rawFormQuery);
+server.post('/rawform', function(req, res, next) {
+    return save(RawForm, req, res, next);
+});
+server.put('/rawform', function(req, res, next) {
+    return save(RawForm, req, res, next);
+});
+
+server.get('/rawform/:id', function(req, res, next) {
+    return getByID(RawForm, req, res, next);
+});
+server.head('/rawform/:id', function(req, res, next) {
+    return getByID(RawForm, req, res, next);
+});
+
+server.del('/rawform/:id', function rm(req, res, next) {
+    return deleteObj(RawForm, req, res, next);
+});
+
+server.get('/rawforms/', function(req, res, next) {
+    return queryObj(RawForm, req, res, next);
+});
 
 server.listen(28001, function() {
     console.log('%s listening at %s', server.name, server.url);
