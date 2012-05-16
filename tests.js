@@ -22,7 +22,7 @@ var createTestData = function(i, callback) {
     client.post('/rawform', formData, callback);
 }
 
-exports.testCreateABunch = function(test) {
+exports.testCreateABunchOfRawForms = function(test) {
     test.leftToDo = 10;
     for (var i = 0; i < 10; i++) {
         createTestData(i, function(err, req, res, obj) {
@@ -34,7 +34,7 @@ exports.testCreateABunch = function(test) {
     }
 }
 
-exports.testGetForm = function(test){
+exports.testGetRawForm = function(test){
     test.expect(1);
     client.get('/rawform/1', function(err, req, res, obj) {
         test.ok(!err, "form get is err: " + err);
@@ -42,7 +42,7 @@ exports.testGetForm = function(test){
     });
 };
 
-exports.testPostForm = function(test){
+exports.testPostRawForm = function(test){
     test.expect(2);
     var formData = {
         "srcURL": "http://www.testsrus.com",
@@ -58,7 +58,7 @@ exports.testPostForm = function(test){
 };
 
 // not sure whether to nest this in the testPostForm test or string it like this
-exports.testGetLastForm = function(test){
+exports.testGetLastRawForm = function(test){
     test.expect(3);
     client.get('/rawform/' + theFormID, function(err, req, res, obj) {
         test.ok(!err, "form get is err: " + err);
@@ -68,7 +68,7 @@ exports.testGetLastForm = function(test){
     });
 };
 
-exports.testDeleteLastForm = function(test){
+exports.testDeleteLastRawForm = function(test){
     test.expect(1);
     client.del('/rawform/' + theFormID, function(err, req, res) {
         test.ok(!err, "form del is err: " + err);
@@ -78,7 +78,7 @@ exports.testDeleteLastForm = function(test){
 
 // not sure whether to nest this in the testDeleteLastForm test or string it like this
 // another alternative would be to test the db directly instead of using the rest api
-exports.testGetAfterDeleteForm = function(test){
+exports.testGetAfterDeleteRawForm = function(test){
     test.expect(2);
     client.get('/rawform/' + theFormID, function(err, req, res, obj) {
         test.ok(!err, "form get is err: " + err);
@@ -88,7 +88,7 @@ exports.testGetAfterDeleteForm = function(test){
     });
 };
 
-exports.testFindForms = function(test) {
+exports.testFindRawForms = function(test) {
     test.expect(2);
     client.get('/rawforms/', function(err, req, res, obj) {
         test.ok(!err, "forms query is err: " + err);
@@ -97,7 +97,7 @@ exports.testFindForms = function(test) {
     });
 }
 
-exports.testFindFormsWithLimitAndSkip = function(test) {
+exports.testFindRawFormsWithLimitAndSkip = function(test) {
     test.expect(5);
     client.get('/rawforms/?limit=5', function(err, req, res, limitList) {
         test.ok(!err, "forms query is err: " + err);
