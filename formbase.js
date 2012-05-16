@@ -112,27 +112,30 @@ var queryObj = function(Model, req, res, next) {
     return next();
 }
 
-server.post('/rawform', function(req, res, next) {
-    return save(RawForm, req, res, next);
-});
-server.put('/rawform', function(req, res, next) {
-    return save(RawForm, req, res, next);
-});
+var initRoutes = function(server, name, Model) {
+    server.post('/' + name, function(req, res, next) {
+        return save(Model, req, res, next);
+    });
+    server.put('/' + name, function(req, res, next) {
+        return save(Model, req, res, next);
+    });
+    server.get('/' + name + '/:id', function(req, res, next) {
+        return getByID(Model, req, res, next);
+    });
+    server.head('/' + name + '/:id', function(req, res, next) {
+        return getByID(Model, req, res, next);
+    });
 
-server.get('/rawform/:id', function(req, res, next) {
-    return getByID(RawForm, req, res, next);
-});
-server.head('/rawform/:id', function(req, res, next) {
-    return getByID(RawForm, req, res, next);
-});
+    server.del('/' + name + '/:id', function rm(req, res, next) {
+        return deleteObj(Model, req, res, next);
+    });
 
-server.del('/rawform/:id', function rm(req, res, next) {
-    return deleteObj(RawForm, req, res, next);
-});
+    server.get('/' + name + 's/', function(req, res, next) {
+        return queryObj(Model, req, res, next);
+    });
+}
 
-server.get('/rawforms/', function(req, res, next) {
-    return queryObj(RawForm, req, res, next);
-});
+initRoutes(server, 'rawform', RawForm);
 
 server.listen(28001, function() {
     console.log('%s listening at %s', server.name, server.url);
