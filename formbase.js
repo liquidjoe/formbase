@@ -9,9 +9,14 @@ var Schema = mongoose.Schema
     , ObjectId = Schema.ObjectId;
 
 /**
- * A Form saved the raw source of a Form we found on the web somewhere.
+ * A Form saved from a <form> we found on the web somewhere.
  * We also store the name of the form and its id (values from the DOM)
- * @type {mongoose.Schema}
+ *
+ * name -- the name of the form from the form tag
+ * formID -- the id of the form from the form tag
+ * srcURL -- the document that the form was found in.
+ * formHTML -- the full HTML of the form
+ * modified -- (auto generated timestamp)
  */
 var FormSchema = new Schema({
     name: String,
@@ -26,11 +31,26 @@ FormSchema.pre('save', function (next) {
     next();
 });
 
+/**
+ * An embedded type in the Mappings object.
+ *
+ * fieldType -- the kind of field that was recognized
+ * name -- the name of the field in the form.
+ */
 var FieldSchema = new Schema({
     fieldType: String,
     name: String
 })
 
+/**
+ * A set of Fields and other data that our field recognizer found.
+ *
+ * form -- a reference to the form that was scanned
+ * hasEmail -- true if an email field was found
+ * hasPassword -- true if a password field was found
+ * hasPhone -- true if a phone field was found
+ * fields -- an array of the Field objects found by the recognizer
+ */
 var MappingSchema = new Schema({
     form: ObjectId,
     hasEmail: Boolean,
