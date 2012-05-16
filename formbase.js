@@ -18,7 +18,7 @@ var Schema = mongoose.Schema
  * formHTML -- the full HTML of the form
  * modified -- (auto generated timestamp)
  */
-var FormSchema = new Schema({
+var RawFormSchema = new Schema({
     name: String,
     formID: String,
     srcURL    : { type: String, index: true },
@@ -26,7 +26,7 @@ var FormSchema = new Schema({
     modified: Date
 });
 
-FormSchema.pre('save', function (next) {
+RawFormSchema.pre('save', function (next) {
     this.modified = new Date();
     next();
 });
@@ -51,48 +51,24 @@ var FieldSchema = new Schema({
  * hasPhone -- true if a phone field was found
  * fields -- an array of the Field objects found by the recognizer
  */
-var MappingSchema = new Schema({
-    form: ObjectId,
+var FormSchema = new Schema({
+    rawform: ObjectId,
     hasEmail: Boolean,
     hasPassword: Boolean,
     hasPhone: Boolean,
     fields: [FieldSchema]
 })
 
+var RawForm = mongoose.model('RawForm', RawFormSchema);
 var Form = mongoose.model('Form', FormSchema);
-var Mappings = mongoose.model('Mapping', MappingSchema);
-
-var createTestForm = function() {
-    console.log("creating test form");
-    var formModel = new Form();
-    formModel.srcURL = 'http://www.hello.com/hello';
-    formModel.formHTML = '<form><input type="password"></form>';
-
-    formModel.save(function (err) {
-        if (err) return;
-        console.log("Saved Form!");
-        var mappings = new Mappings();
-        mappings.form = formModel._id;
-        mappings.fields.push({fieldType: "password", name: "pw"});
-        mappings.save(function(err){
-            if (err) return;
-
-            console.log("Saved Mappings!");
-        });
-    });
-}
-
-function respond(req, res, next) {
-    res.send('hello ' + req.params.name);
-}
 
 var server = restify.createServer({name: "FormBase"});
 server.use(restify.queryParser());      // query params copied into req.params
 server.use(restify.bodyParser({ mapParams: false }));
 
-function getFormByID(req, res, next) {
+function getRawFormByID(req, res, next) {
     var id = req.params["id"];
-    Form.findById(id).findOne(function(err, doc) {
+    RawForm.findById(id).findOne(function(err, doc) {
         if (err) {
             res.json({});
         } else {
@@ -102,31 +78,31 @@ function getFormByID(req, res, next) {
     return next();
 }
 
-var saveForm = function create(req, res, next) {
-    var formModel = new Form(req.body);
+var saveRawForm = function create(req, res, next) {
+    var formModel = new RawForm(req.body);
     formModel.save(function(err){
         res.json({id: formModel.get('_id')});
     });
     return next();
 }
 
-server.post('/form', saveForm);
-server.put('/form', saveForm);
+server.post('/rawform', saveRawForm);
+server.put('/rawform', saveRawForm);
 
-server.get('/form/:id', getFormByID);
-server.head('/form/:id', getFormByID);
+server.get('/rawform/:id', getRawFormByID);
+server.head('/rawform/:id', getRawFormByID);
 
-server.del('/form/:id', function rm(req, res, next) {
+server.del('/rawform/:id', function rm(req, res, next) {
     var id = req.params["id"];
-    Form.findById(id).findOne(function(err, doc) {
+    RawForm.findById(id).findOne(function(err, doc) {
         doc.remove();
         res.send(204);
     });
     return next();
 });
 
-var formQuery = function(req, res, next) {
-    var query = Form.find();
+var rawFormQuery = function(req, res, next) {
+    var query = RawForm.find();
     if (req.params["limit"]) {
         var limit = parseInt(req.params["limit"]);
         query.limit(limit);
@@ -142,7 +118,7 @@ var formQuery = function(req, res, next) {
     return next();
 }
 
-server.get('/forms/', formQuery);
+server.get('/rawforms/', rawFormQuery);
 
 server.listen(28001, function() {
     console.log('%s listening at %s', server.name, server.url);

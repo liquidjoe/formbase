@@ -45,9 +45,9 @@ in another window:
 
 Formbase Objects
 ----------------
-There are 2 types of objects current defined in the Formbase -- Forms and Mappings.
+There are 2 types of objects current defined in the Formbase -- RawForms and Forms.
 
-A Form has the following fields:
+A RawForm has the following fields:
 
  * name -- the name of the form from the form tag
  * formID -- the id of the form from the form tag
@@ -55,21 +55,21 @@ A Form has the following fields:
  * formHTML -- the full HTML of the form
  * modified -- (auto generated timestamp)
  
-Mappings are intended to be the saved results of running
+Forms are intended to be the saved results of running
 our field recognizer on the form.
 
-A Mappings has the following fields:
+A Form has the following fields:
 
- * form -- a reference to the form that was scanned
+ * rawform -- a reference to the form that was scanned
  * hasEmail -- true if an email field was found
  * hasPassword -- true if a password field was found
  * hasPhone -- true if a phone field was found
  * fields -- an array of the Field objects found by the recognizer
 
-Storing Forms
+Storing RawForms
 -------------
 You can store new forms via a POST request to
-**http://localhost:28001/form**
+**http://localhost:28001/rawform**
 
 `$ curl -v -H "Content-Type: application/json" -X POST -d '{"srcURL": "http://www.cnn.com", "formID": "loginForm", "formHTML": "<form></form>"}' localhost:28001/form`
 
@@ -77,11 +77,11 @@ The post request returns the ID of the form that was created or modified.
 
 `{"id":"4fb3fb63866e410938000002"}`
 
-Retrieving Forms
+Retrieving RawForms
 ----------------
-Individual forms can be accessed by ID:
+Individual raw forms can be accessed by ID:
 
-**http://localhost:28001/form/:id**
+**http://localhost:28001/rawform/:id**
 
 `$ curl -v -H "Content-Type: application/json" http://localhost:28001/form/4fb3fb63866e410938000002`
 
@@ -93,12 +93,12 @@ Individual forms can be accessed by ID:
 
 You can get to the list of forms using a query URL:
 
-**http://localhost:28001/forms/**
+**http://localhost:28001/rawforms/**
 
-This will return an array with every form! So you really want to use limit and skip parameters:
+This will return an array with every raw form! So you really want to use limit and skip parameters:
 
-**http://localhost:28001/forms/?limit=100**
+**http://localhost:28001/rawforms/?limit=100**
 …will give you the first 100
 
-**http://localhost:28001/forms/?limit=100&skip=3500**
+**http://localhost:28001/rawforms/?limit=100&skip=3500**
 …will give you 100 starting at number 3500

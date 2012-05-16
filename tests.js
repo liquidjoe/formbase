@@ -19,7 +19,7 @@ var createTestData = function(i, callback) {
         "formHTML": '<form id="saveForm"><input type="password" name="pw"><input type="submit"></form>',
         "formID": "saveForm"
     }
-    client.post('/form', formData, callback);
+    client.post('/rawform', formData, callback);
 }
 
 exports.testCreateABunch = function(test) {
@@ -36,7 +36,7 @@ exports.testCreateABunch = function(test) {
 
 exports.testGetForm = function(test){
     test.expect(1);
-    client.get('/form/1', function(err, req, res, obj) {
+    client.get('/rawform/1', function(err, req, res, obj) {
         test.ok(!err, "form get is err: " + err);
         test.done();
     });
@@ -49,7 +49,7 @@ exports.testPostForm = function(test){
         "formHTML": '<form id="saveForm"><input type="password" name="pw"><input type="submit"></form>',
         "formID": "saveForm"
     }
-    client.post('/form', formData, function(err, req, res, obj) {
+    client.post('/rawform', formData, function(err, req, res, obj) {
         test.ok(!err, "form post is err: " + err);
         theFormID = obj.id;
         test.ok(theFormID, "the formID is something");
@@ -60,7 +60,7 @@ exports.testPostForm = function(test){
 // not sure whether to nest this in the testPostForm test or string it like this
 exports.testGetLastForm = function(test){
     test.expect(3);
-    client.get('/form/' + theFormID, function(err, req, res, obj) {
+    client.get('/rawform/' + theFormID, function(err, req, res, obj) {
         test.ok(!err, "form get is err: " + err);
         test.ok(obj, "got the form we put in");
         test.ok(obj._id == theFormID, "has the right ID");
@@ -70,7 +70,7 @@ exports.testGetLastForm = function(test){
 
 exports.testDeleteLastForm = function(test){
     test.expect(1);
-    client.del('/form/' + theFormID, function(err, req, res) {
+    client.del('/rawform/' + theFormID, function(err, req, res) {
         test.ok(!err, "form del is err: " + err);
         test.done();
     });
@@ -80,7 +80,7 @@ exports.testDeleteLastForm = function(test){
 // another alternative would be to test the db directly instead of using the rest api
 exports.testGetAfterDeleteForm = function(test){
     test.expect(2);
-    client.get('/form/' + theFormID, function(err, req, res, obj) {
+    client.get('/rawform/' + theFormID, function(err, req, res, obj) {
         test.ok(!err, "form get is err: " + err);
         test.ok(!(obj._id), "form we put in is gone now");
         theFormID = null;
@@ -90,7 +90,7 @@ exports.testGetAfterDeleteForm = function(test){
 
 exports.testFindForms = function(test) {
     test.expect(2);
-    client.get('/forms/', function(err, req, res, obj) {
+    client.get('/rawforms/', function(err, req, res, obj) {
         test.ok(!err, "forms query is err: " + err);
         test.ok(obj.length, "got a list of forms");
         test.done();
@@ -99,12 +99,12 @@ exports.testFindForms = function(test) {
 
 exports.testFindFormsWithLimitAndSkip = function(test) {
     test.expect(5);
-    client.get('/forms/?limit=5', function(err, req, res, limitList) {
+    client.get('/rawforms/?limit=5', function(err, req, res, limitList) {
         test.ok(!err, "forms query is err: " + err);
         test.ok(limitList.length == 5, "got only a limit of forms");
 
         // nesting call so we can check the results
-        client.get('/forms/?limit=5&skip=4', function(err, req, res, skipList) {
+        client.get('/rawforms/?limit=5&skip=4', function(err, req, res, skipList) {
             test.ok(!err, "forms query is err: " + err);
             test.ok(skipList.length == 5, "got only a limit of forms");
             test.ok(skipList[0]._id == limitList[4]._id, "first skipped list == last limitList");
