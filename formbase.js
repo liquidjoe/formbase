@@ -136,6 +136,7 @@ var initRoutes = function(server, name, Model) {
 }
 
 initRoutes(server, 'rawform', RawForm);
+initRoutes(server, 'form', Form);
 
 server.listen(28001, function() {
     console.log('%s listening at %s', server.name, server.url);
