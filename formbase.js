@@ -32,7 +32,7 @@ RawFormSchema.pre('save', function (next) {
 });
 
 /**
- * An embedded type in the Mappings object.
+ * An embedded type in the Form object.
  *
  * fieldType -- the kind of field that was recognized
  * name -- the name of the field in the form.
