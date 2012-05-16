@@ -13,6 +13,27 @@ var client = restify.createJsonClient({
 
 var theFormID = null;
 
+var createTestData = function(i, callback) {
+    var formData = {
+        "srcURL": "http://www.testsrus.com/" + i,
+        "formHTML": '<form id="saveForm"><input type="password" name="pw"><input type="submit"></form>',
+        "formID": "saveForm"
+    }
+    client.post('/form', formData, callback);
+}
+
+exports.testCreateABunch = function(test) {
+    test.leftToDo = 10;
+    for (var i = 0; i < 10; i++) {
+        createTestData(i, function(err, req, res, obj) {
+            test.leftToDo--;
+            if (!test.leftToDo) {
+                test.done();
+            }
+        });
+    }
+}
+
 exports.testGetForm = function(test){
     test.expect(1);
     client.get('/form/1', function(err, req, res, obj) {
