@@ -5,6 +5,13 @@ var db = _db.createClient({
     host: 'localhost'
 });
 
+var restify = require('restify');
+
+var formbaseClient = restify.createJsonClient({
+    url: 'http://localhost:28001'
+});
+
+
 db.query('use crawler',function(err) {
     if (err) {
         console.log("holy cow, no crawler db: " + err);
@@ -14,14 +21,25 @@ db.query('use crawler',function(err) {
 });
 
 var insertAForm = function(htmlID, rawHTML, siteURL) {
-    console.log("would send to formbase: " + htmlID);
+    var formData = {
+        "srcURL": siteURL,
+        "formHTML": rawHTML,
+        "crawlerID": htmlID
+    }
+    formbaseClient.post('/rawform', formData, function(err, req, res, obj) {
+        if (err) {
+            console.log("\nerror posting to formbase: " + err + "\n");
+        }
+    });
 }
 
 var getFormsOut = function(start, howmany, total) {
     if(start >= total){
-        console.log("done");
-        process.exit(0);
+        console.log("\ndone");
+        return;
+        //process.exit(0);
     }
+    process.stdout.write("Importing " + start + " of " + total + "\r");
 
     db.query("select html.id,site.site,html.html from site,html where site.id=html.site_id LIMIT ?, ?",
              [start, howmany], function(err,forms) {
