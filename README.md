@@ -8,6 +8,11 @@ it has no access control or anything, yet, so its only suitable for internal use
 Setting up
 ----------
 
+To run locally, you will need [MongoDB](http://www.mongodb.org/display/DOCS/Quickstart).
+Using brew to install is a good way to get going on Mac locally:
+
+`$ brew install mongodb`
+
 First of all, you need Node.js. I'd suggest installing via
 [a package manager](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager)
 
