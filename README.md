@@ -154,3 +154,19 @@ This will return an array with every raw form! So you really want to use limit a
 
 **http://localhost:28001/forms/?limit=100&skip=3500**
 …will give you 100 starting at number 3500
+
+Exporting From The Crawler
+--------------------------
+The crawler is currently located at 50.116.36.86 along with the Formbase. It logs forms it finds to a local MySQL database. You can run a script to export all the crawler data into the Formbase:
+
+`$ node crawler_import.js`
+
+This should take around 10 minutes to run. Currently it just dumps everything in there (TODO -- drop the rawforms table first or replace existing forms)
+
+Importing A Local Copy of the Formbase
+--------------------------------------
+You can import data from the Formbase into your local server. The local server must be running first, then in another window run the remote_import script:
+
+`$ node remote_import.js`
+
+Use the --max option to specify how many forms you want to copy. Since this import copies the mongo objects directly, running it multiple times will replace but not add forms to your local db, unless you use a larger --max. This is because the RawForm entries will have the same _id and replace the existing ones. 
