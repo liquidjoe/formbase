@@ -34,18 +34,30 @@ RawFormSchema.pre('save', function (next) {
 /**
  * An embedded type in the Form object.
  *
- * fieldType -- the kind of field that was recognized
+ * fieldType -- the input type of the field
  * name -- the name of the field in the form.
+ * id -- the id of the field
+ * className -- class attribute of the field
+ * dataType -- the type it was recognized as
+ * label -- the label/placeholder associated with this field
  */
 var FieldSchema = new Schema({
     fieldType: String,
-    name: String
-})
+    id: String,
+    className: String,
+    name: String,
+    dataType: String,
+    label: String
+});
 
 /**
  * A set of Fields and other data that our field recognizer found.
  *
  * form -- a reference to the form that was scanned
+ * formType -- form type as recognized by analyzer
+ * id -- id attribute of form element
+ * action -- action attribute of form element
+ * method -- method attribute of form element
  * hasEmail -- true if an email field was found
  * hasPassword -- true if a password field was found
  * hasPhone -- true if a phone field was found
@@ -53,11 +65,15 @@ var FieldSchema = new Schema({
  */
 var FormSchema = new Schema({
     rawform: ObjectId,
+    formType: String,
+    id: String,
+    action: String,
+    method: String,
     hasEmail: Boolean,
     hasPassword: Boolean,
     hasPhone: Boolean,
     fields: [FieldSchema]
-})
+});
 
 var RawForm = mongoose.model('RawForm', RawFormSchema);
 var Form = mongoose.model('Form', FormSchema);
