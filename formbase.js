@@ -72,7 +72,13 @@ var FormSchema = new Schema({
     hasEmail: Boolean,
     hasPassword: Boolean,
     hasPhone: Boolean,
+    modified: Date,
     fields: [FieldSchema]
+});
+
+FormSchema.pre('save', function(next){
+    this.modified = new Date();
+    next();
 });
 
 var RawForm = mongoose.model('RawForm', RawFormSchema);
@@ -95,7 +101,20 @@ var getByID = function(Model, req, res, next) {
 }
 
 var save = function(Model, req, res, next) {
+    var fields = [];
+    if(req.body.fields){
+        fields = req.body.fields.slice();
+        req.body.fields = [];
+    }
+
     var model = new Model(req.body);
+
+    if(fields.length > 0){
+        for(var i=0;i<fields.length;i++){
+            model.fields.push(fields[i]);
+        }
+    }
+
     model.save(function(err){
         res.json({id: model.get('_id')});
     });
